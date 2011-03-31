@@ -32,6 +32,8 @@ class HandlebarsCommand < Thor
     
     puts "  Compiling #{files.length} templates..." if options[:out]
     
+    compiled_templates = {}
+    
     files.each do |file|
       puts "    #{file}..." if options[:out]
       method = file.gsub(Regexp.new("^#{directory}"), "")
@@ -41,9 +43,12 @@ class HandlebarsCommand < Thor
       template = File.read(file)
       
       ctx["template"] = template;
-      compiled = ctx.eval("Handlebars.compile(template).source.toString();")
+      compiled = ctx.eval("Handlebars.compile(template).children[0];")
+      puts compiled.source
       
-      target << "var #{options[:prefix]}#{method} = #{compiled};\n\n"
+      (options[:prefix] + method).split(".").each do |part|
+        puts part
+      end
     end
     
     target.close if options[:out]
