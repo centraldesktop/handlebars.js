@@ -10,47 +10,47 @@ class HandlebarsCommand < Thor
   method_option :prefix, :type => :string, :default => "Handlebars.Templates"
   method_option :out, :type => :string, :desc => "Output file for compiled templates, by default output is written to STDOUT"
   def compile(directory)
-    
+
     if !File.directory?(directory)
       puts "  ERROR: The given template directory doesn't exist."
       exit
     end
-    
+
     files = Dir["#{directory}/**/*.hbs"]
     if files.empty?
       puts "  ERROR: No template files were found."
       exit
     end
-    
+
     ctx = V8::Context.new
     ctx.load(File.dirname(__FILE__) + "/../dist/handlebars.js")
-    
+
     target = $stdout
     if options[:out]
       target = File.open(options[:out], "w")
     end
-    
+
     puts "  Compiling #{files.length} templates..." if options[:out]
-    
+
     compiled_templates = {}
-    
+
     files.each do |file|
       puts "    #{file}..." if options[:out]
       method = file.gsub(Regexp.new("^#{directory}"), "")
       method.gsub!(/\.hbs$/, "")
       method.gsub!(/\/+/, ".")
-      
+
       template = File.read(file)
-      
+
       ctx["template"] = template;
-      compiled = ctx.eval("Handlebars.compile(template).children[0];")
-      puts compiled.source
-      
+      compiled = ctx.eval("Handlebars.buildSource(Handlebars.compile(template));")
+      puts compiled
+
       (options[:prefix] + method).split(".").each do |part|
         puts part
       end
     end
-    
+
     target.close if options[:out]
   end
 end
