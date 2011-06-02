@@ -696,3 +696,18 @@ test("block helpers can take an optional hash", function() {
   var result = template({}, helpers);
   equals(result, "GOODBYE CRUEL world");
 });
+
+module("Script Generation");
+
+test("generated function executes", function() {
+  var template = Handlebars.compile('Dudes: {{#dudes}}{{> dudePartial}}, {{/dudes}}');
+  var partials = { dudePartial: "{{printDude this}}" };
+  var helpers = { printDude: function(dude) { return dude.name + " " + dude.team; } };
+  var dudes = [{name: "Yehuda", team: "Strobe" }, { name: "Alan", team: "Carsonified" }];
+
+  var source = Handlebars.buildSource(template);
+  p(source);
+  var fn = eval(Handlebars.buildSource(template));
+  result = fn(dudes, helpers, partials);
+  equals(result, "Dudes: Yehuda Strobe, Alan Carsonified, ");
+});
