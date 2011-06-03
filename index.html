@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Handlebars Test</title>
+  </head>
+  <body>
+    <script type="text/javascript" src="dist/handlebars.js"></script>
+    <script type="text/javascript">
+      console.log("Running!");
+var template = function(context, helpers, partials) {helpers = helpers || Handlebars.helpers; partials = partials || Handlebars.partials;return (function(context, helpers, partials) {var container = Handlebars.VM.container();container.render = function(context, helpers, partials) {var buffer = "", currentContext = context, stack1, stack2, tmp1;
+helpers = helpers || Handlebars.helpers; partials = partials || Handlebars.partials;
+buffer = buffer + "Dudes: ";
+stack1 = {};
+if('dudes' in helpers) { stack2 = helpers.dudes; } else { stack2 = currentContext.dudes; }
+tmp1 = this.program(0, helpers, partials);
+tmp1.hash = stack1;
+tmp1.fn = tmp1;
+tmp1.inverse = this.noop;
+if(typeof stack2 === 'function') { stack1 = stack2.call(context, tmp1, this.noop); }
+else { stack1 = helpers.blockHelperMissing.call(context, stack2, tmp1, this.noop); }
+if(stack1 || stack1 === 0) { buffer = buffer + stack1; }
+buffer = buffer + "\n";
+return buffer;};container.children.push(function(context, helpers, partials) {var container = Handlebars.VM.container();container.render = function(context, helpers, partials) {var buffer = "", currentContext = context, stack1;
+helpers = helpers || Handlebars.helpers; partials = partials || Handlebars.partials;
+stack1 = context;
+stack1 = this.invokePartial(partials.dudePartial, 'dudePartial', stack1, helpers, partials);;
+if(stack1 || stack1 === 0) { buffer = buffer + stack1; }
+buffer = buffer + ", ";
+return buffer;};return container.render(context, helpers, partials);});return container.render(context, helpers, partials);})(context, helpers, partials);}
+
+      Handlebars.registerPartial('dudePartial', "{{printDude this}}");
+      Handlebars.registerHelper('printDude', function(dude) { return dude.name + " " + dude.team; });
+      var dudes = {dudes: [{name: "Yehuda", team: "Strobe" }, { name: "Alan", team: "Carsonified" }]};
+
+      console.log(template(dudes));
+    </script>
+  </body>
+</html>

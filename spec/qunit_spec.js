@@ -701,13 +701,15 @@ module("Script Generation");
 
 test("generated function executes", function() {
   var template = Handlebars.compile('Dudes: {{#dudes}}{{> dudePartial}}, {{/dudes}}');
-  var partials = { dudePartial: "{{printDude this}}" };
-  var helpers = { printDude: function(dude) { return dude.name + " " + dude.team; } };
-  var dudes = [{name: "Yehuda", team: "Strobe" }, { name: "Alan", team: "Carsonified" }];
+  Handlebars.registerPartial('dudePartial', "{{printDude this}}");
+  Handlebars.registerHelper('printDude', function(dude) { return dude.name + " " + dude.team; });
+  var dudes = {dudes: [{name: "Yehuda", team: "Strobe" }, { name: "Alan", team: "Carsonified" }]};
 
   var source = Handlebars.buildSource(template);
   p(source);
-  var fn = eval(Handlebars.buildSource(template));
-  result = fn(dudes, helpers, partials);
+  var fn = eval("(" + Handlebars.buildSource(template) + ")");
+  var result = fn(dudes);
   equals(result, "Dudes: Yehuda Strobe, Alan Carsonified, ");
+
+  Handlebars.resetHelpersAndPartials();
 });
